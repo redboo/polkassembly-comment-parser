@@ -2,10 +2,13 @@ import logging
 import os
 import time
 from datetime import datetime
+from urllib.parse import urlparse
 
 from arg_parser import parse_args
 from logging_utils import setup_logging
 from process_url import process_url
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def fetch_urls_from_file(file_path: str) -> list[str]:
@@ -19,7 +22,7 @@ def fetch_urls_from_file(file_path: str) -> list[str]:
         return [url.strip() for url in urls_file if url.strip() and not url.startswith("#")]
 
 
-def run() -> None:
+def run(one_file=True) -> None:
     args = parse_args()
     setup_logging(args.log)
 
@@ -38,11 +41,33 @@ def run() -> None:
             logging.error("Список URL-адресов пуст. Завершение программы.")
             break
 
-        downloads_dir = os.path.join("downloads", datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+        downloads_dir = (
+            os.path.join("downloads", datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) if not one_file else "downloads"
+        )
         os.makedirs(downloads_dir, exist_ok=True)
 
+        filename = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_polkassembly.csv"
+        file_pathname = os.path.join(BASE_DIR, downloads_dir, filename)
+
+        written = False
         for url in urls:
-            process_url(url, downloads_dir, start_date=start_date, end_date=end_date)
+            url = url.strip()
+            network = urlparse(url).netloc.split(".")[0]
+            logging.info(f"Парсинг запущен для URL: {url}")
+            if not one_file:
+                filename = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_{network}.csv"
+                file_pathname = os.path.join(BASE_DIR, downloads_dir, filename)
+
+            has_data = process_url(url, network, file_pathname, start_date=start_date, end_date=end_date)
+
+            if not has_data:
+                logging.info(f"Парсинг завершен для URL: {url} Результатов не найдено")
+            else:
+                written = True
+                logging.info(f"Парсинг завершен для URL: {url} Результат сохранен в {file_pathname}")
+
+        if not written:
+            os.remove(file_pathname)
 
         if not args.interval:
             break
