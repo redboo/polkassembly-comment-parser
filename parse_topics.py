@@ -20,10 +20,11 @@ def parse_topics(url: str, session: requests.Session, limit: int | None = None) 
     Если не удалось получить список топиков, возвращает пустой словарь."""
     logging.info(f"Получение топиков для URL: {url}")
     try:
-        response = session.get(url, timeout=10)
+        response = session.get(url, timeout=20)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
-        raise Exception(f"Не удалось выполнить запрос к URL: {url}") from e
+        logging.error(f"Не удалось выполнить запрос к URL: {url}: {e}")
+        return {}
 
     soup = bs(response.text, "lxml")
     if categories := soup.find("script", {"id": "__NEXT_DATA__"}):

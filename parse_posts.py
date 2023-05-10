@@ -22,10 +22,11 @@ def parse_posts(url: str, topic_type: str, count_posts: int, is_on: str, session
     posts_url = f"https://api.polkassembly.io/api/v1/listing/{is_on}-chain-posts"
     params = {"page": 1, "listingLimit": count_posts, "proposalType": topic_type}
     try:
-        response = session.get(posts_url, params=params, timeout=10)
+        response = session.get(posts_url, params=params, timeout=20)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
-        raise Exception(f"Не удалось выполнить запрос к URL: {url}") from e
+        logging.error(f"Не удалось выполнить запрос к URL: {url}: {e}")
+        return []
 
     posts = response.json()["posts"]
 
