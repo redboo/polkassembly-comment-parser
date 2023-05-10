@@ -41,13 +41,13 @@ def run(one_file=True) -> None:
             logging.error("Список URL-адресов пуст. Завершение программы.")
             break
 
-        downloads_dir = (
+        download_dir = (
             os.path.join("downloads", datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) if not one_file else "downloads"
         )
-        os.makedirs(downloads_dir, exist_ok=True)
+        os.makedirs(download_dir, exist_ok=True)
 
         filename = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_polkassembly.csv"
-        file_pathname = os.path.join(BASE_DIR, downloads_dir, filename)
+        file_pathname = os.path.abspath(f"{download_dir}/{filename}")
 
         written = False
         for url in urls:
@@ -56,7 +56,7 @@ def run(one_file=True) -> None:
             logging.info(f"Парсинг запущен для URL: {url}")
             if not one_file:
                 filename = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_{network}.csv"
-                file_pathname = os.path.join(BASE_DIR, downloads_dir, filename)
+                file_pathname = os.path.abspath(f"{download_dir}/{filename}")
 
             has_data = process_url(url, network, file_pathname, start_date=start_date, end_date=end_date)
 

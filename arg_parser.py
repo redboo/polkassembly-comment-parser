@@ -1,4 +1,5 @@
 import argparse
+import os
 
 
 def parse_args() -> argparse.Namespace:
@@ -30,7 +31,7 @@ def parse_args() -> argparse.Namespace:
     )
     group.add_argument(
         "--urls-file",
-        default="urls.txt",
+        default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "urls.txt"),
         type=str,
         help="Путь к файлу со списком URL-адресов для парсинга",
     )
