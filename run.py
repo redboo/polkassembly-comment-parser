@@ -42,7 +42,7 @@ def run(one_file=True) -> None:
             break
 
         download_dir = (
-            os.path.join("downloads", datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) if not one_file else "downloads"
+            "downloads" if one_file else os.path.join("downloads", datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
         )
         os.makedirs(download_dir, exist_ok=True)
 
@@ -58,14 +58,18 @@ def run(one_file=True) -> None:
                 filename = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_{network}.csv"
                 file_pathname = os.path.abspath(f"{download_dir}/{filename}")
 
-            has_data = process_url(url, network, file_pathname, start_date=start_date, end_date=end_date)
-
-            if not has_data:
-                logging.info(f"Парсинг завершен для URL: {url} Результатов не найдено")
-            else:
+            if process_url(
+                url,
+                network,
+                file_pathname,
+                start_date=start_date,
+                end_date=end_date,
+            ):
                 written = True
                 logging.info(f"Парсинг завершен для URL: {url} Результат сохранен в {file_pathname}")
 
+            else:
+                logging.info(f"Парсинг завершен для URL: {url} Результатов не найдено")
         if not written:
             os.remove(file_pathname)
 
