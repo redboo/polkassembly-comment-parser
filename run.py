@@ -42,7 +42,7 @@ def run(one_file=True) -> None:
             break
 
         download_dir = (
-            os.path.join("downloads", datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) if not one_file else "downloads"
+            "downloads" if one_file else os.path.join("downloads", datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
         )
         os.makedirs(download_dir, exist_ok=True)
 
