@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 from typing import Any
@@ -27,7 +29,8 @@ def parse_topics(url: str, session: requests.Session, limit: int | None = None) 
         return {}
 
     soup = bs(response.text, "lxml")
-    if categories := soup.find("script", {"id": "__NEXT_DATA__"}):
+    categories = soup.find("script", {"id": "__NEXT_DATA__"})
+    if categories:
         data = json.loads(categories.text)
         try:
             topics = {
